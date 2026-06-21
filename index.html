@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Father's Day, Appa</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@400;600;700&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body, html {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: #0a0a0f;
+        }
+
+        #starCanvas {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 1;
+        }
+
+        /* ── Slides ── */
+        .slide {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center;
+            opacity: 0; pointer-events: none;
+            z-index: 5;
+            padding: 16px;
+        }
+        .slide.active { opacity: 1; pointer-events: all; z-index: 10; }
+
+        .slide-enter { animation: slideEnter 0.6s cubic-bezier(0.22,1,0.36,1) forwards; }
+        @keyframes slideEnter {
+            0%  { opacity: 0; transform: scale(0.88) translateY(30px); }
+            100%{ opacity: 1; transform: scale(1)    translateY(0); }
+        }
+
+        #slide1 { background: radial-gradient(ellipse at 60% 40%, #1a1030 0%, #0a0a0f 70%); }
+        #slide2 { background: radial-gradient(ellipse at 40% 60%, #0d1f3c 0%, #0a0a0f 70%); }
+        #slide3 { background: radial-gradient(ellipse at 50% 50%, #111820 0%, #0a0a0f 80%); }
+        #slide4 { background: #0a0a0f; }
+        #slide5 { background: radial-gradient(ellipse at 50% 30%, #120c20 0%, #0a0a0f 70%); }
+
+        /* ── Typography ── */
+        .display-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 7vw, 4.5rem);
+            font-weight: 900;
+            color: #f5c842;
+            letter-spacing: -0.01em;
+            line-height: 1.1;
+            text-shadow: 0 0 60px rgba(245,200,66,0.35);
+        }
+        .sub-text {
+            font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+            color: #a0b8d8;
+            font-weight: 400;
+            margin-top: 10px;
+            letter-spacing: 0.04em;
+        }
+
+        /* ── Button ── */
+        .btn {
+            margin-top: 1.4rem;
+            padding: 13px 40px;
+            border: 1.5px solid rgba(245,200,66,0.6);
+            border-radius: 50px;
+            background: transparent;
+            color: #f5c842;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow 0.3s;
+        }
+        .btn::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: rgba(245,200,66,0.12);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.35s ease;
+        }
+        .btn:hover::before { transform: scaleX(1); }
+        .btn:hover { box-shadow: 0 0 28px rgba(245,200,66,0.35); }
+
+        .btn .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(245,200,66,0.45);
+            transform: scale(0);
+            animation: rippleAnim 0.55s linear;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+        /* ── Divider ── */
+        .gold-line {
+            width: 60px; height: 2px;
+            background: linear-gradient(90deg, transparent, #f5c842, transparent);
+            margin: 12px auto;
+        }
+
+        /* ── Letter: NO SCROLL ── */
+        .letter-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(245,200,66,0.2);
+            border-radius: 20px;
+            padding: clamp(14px, 2.5vw, 26px) clamp(16px, 3vw, 32px);
+            width: min(640px, 92vw);
+            text-align: left;
+            overflow: hidden;
+        }
+        .letter-heading {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(0.95rem, 2.5vw, 1.25rem);
+            color: #f5c842;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .letter-body {
+            color: #ccd9ea;
+            font-size: clamp(0.7rem, 1.6vw, 0.88rem);
+            line-height: 1.6;
+            font-weight: 400;
+            white-space: pre-line;
+        }
+        .letter-sig {
+            margin-top: 8px;
+            text-align: right;
+            color: #f5c842;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+        }
+
+        /* ── Countdown ── */
+        #countdownText {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(6rem, 25vw, 12rem);
+            font-weight: 900;
+            color: #f5c842;
+            text-shadow: 0 0 80px rgba(245,200,66,0.5);
+        }
+        #countdownText.pop { animation: countPop 0.35s ease; }
+        @keyframes countPop {
+            0%  { transform: scale(1.5); opacity: 0.4; }
+            100%{ transform: scale(1);   opacity: 1; }
+        }
+
+        /* ── Photo slideshow ── */
+        .slideshow-wrap {
+            position: relative;
+            width: clamp(230px, 52vw, 310px);
+            height: clamp(230px, 52vw, 310px);
+        }
+        .photo-ring {
+            position: absolute; inset: -10px;
+            border-radius: 50%;
+            border: 2px solid rgba(245,200,66,0.5);
+            animation: pulseRing 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .photo-ring-2 {
+            position: absolute; inset: -20px;
+            border-radius: 50%;
+            border: 1px solid rgba(245,200,66,0.2);
+            animation: pulseRing 3s ease-in-out infinite 1s;
+            pointer-events: none;
+        }
+        @keyframes pulseRing {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50%       { opacity: 1;   transform: scale(1.03); }
+        }
+        .dad-slide {
+            position: absolute; inset: 0;
+            border-radius: 50%;
+            object-fit: cover;
+            width: 100%; height: 100%;
+            border: 4px solid #f5c842;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        .dad-slide.show { opacity: 1; }
+
+        .finale-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.4rem, 4.5vw, 2.6rem);
+            font-weight: 700;
+            color: #f5c842;
+            margin-top: 22px;
+            text-shadow: 0 0 40px rgba(245,200,66,0.3);
+        }
+        .finale-sub {
+            color: #a0b8d8;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            margin-top: 6px;
+            letter-spacing: 0.06em;
+        }
+
+        .icon-deco {
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+
+<audio id="bgMusic" preload="auto" loop>
+    <source src="dad.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="starCanvas"></canvas>
+
+<!-- SLIDE 1 -->
+<div class="slide active" id="slide1">
+    <div class="icon-deco">⭐</div>
+    <h1 class="display-title">Hi, Appa...</h1>
+    <div class="gold-line"></div>
+    <p class="sub-text">I made something just for you</p>
+    <button class="btn" onclick="startExperience(this)">Open Your Gift</button>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide" id="slide2">
+    <div class="icon-deco">🎖️</div>
+    <h1 class="display-title">Happy Father's Day</h1>
+    <div class="gold-line"></div>
+    <p class="sub-text">From your child, with all my love</p>
+    <button class="btn" onclick="btnClick(this, ()=>nextSlide(3))">Continue →</button>
+</div>
+
+<!-- SLIDE 3 — Letter, no scroll -->
+<div class="slide" id="slide3">
+    <div class="letter-card">
+        <p class="letter-heading">A Letter for Appa 💛</p>
+        <div class="gold-line"></div>
+        <p class="letter-body">Dear Appa,
+
+There are no words big enough to describe what you mean to me. You have been my pillar — quiet, strong, and always there, even when I didn't say thank you enough.
+
+You worked hard so I could have opportunities you never did. You stayed patient when I was difficult. You gave me your time, your wisdom, and your love — without ever asking for anything in return.
+
+I look up to you more than you know. The way you carry your responsibilities, the way you protect our family, the way you keep going no matter how hard things get — that is the kind of strength I want to carry too.
+
+Thank you for being the greatest father I could have ever asked for.
+
+I love you, Appa. Today, tomorrow, always. 💛</p>
+        <p class="letter-sig">— Saranyan</p>
+        <div style="text-align:center;margin-top:10px;">
+            <button class="btn" onclick="btnClick(this,()=>nextSlide(4))">See Your Surprise ✨</button>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 4 — Countdown -->
+<div class="slide" id="slide4">
+    <div id="countdownText">3</div>
+</div>
+
+<!-- SLIDE 5 — Slideshow Finale -->
+<div class="slide" id="slide5">
+    <div class="slideshow-wrap">
+        <div class="photo-ring"></div>
+        <div class="photo-ring-2"></div>
+        <img class="dad-slide show" src="dad1.jpeg" alt="Appa 1">
+        <img class="dad-slide"      src="dad2.jpeg" alt="Appa 2">
+    </div>
+    <p class="finale-title">Happy Father's Day, Appa! 🌟</p>
+    <p class="finale-sub">The strongest man I know &nbsp;·&nbsp; My forever hero</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
+/* ══════════════════════════════════
+   CANVAS — stars + explosions
+══════════════════════════════════ */
+const canvas = document.getElementById('starCanvas');
+const ctx    = canvas.getContext('2d');
+const music  = document.getElementById('bgMusic');
+
+let stars     = [];
+let particles = [];
+let shooters  = [];
+
+function resizeCanvas() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+function initStars() {
+    resizeCanvas();
+    stars = [];
+    for (let i = 0; i < 180; i++) {
+        stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            r: Math.random() * 1.5 + 0.3,
+            alpha: Math.random(),
+            speed: Math.random() * 0.008 + 0.003,
+            dir: Math.random() > 0.5 ? 1 : -1
+        });
+    }
+}
+
+function spawnShooter() {
+    const angle = Math.PI / 5;
+    shooters.push({
+        x: Math.random() * canvas.width * 0.6,
+        y: Math.random() * canvas.height * 0.4,
+        vx: Math.cos(angle) * (6 + Math.random() * 5),
+        vy: Math.sin(angle) * (6 + Math.random() * 5),
+        life: 1, tail: []
+    });
+}
+setInterval(spawnShooter, 2800);
+
+function spawnExplosion(x, y, count, colors) {
+    for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 / count) * i + Math.random() * 0.3;
+        const speed = 2 + Math.random() * 5;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        particles.push({
+            x, y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            alpha: 1,
+            r: 1.5 + Math.random() * 2.5,
+            decay: 0.012 + Math.random() * 0.012,
+            color, glow: color
+        });
+    }
+}
+
+const BG_COLORS = [
+    ['#f5c842','#ffe082','#fff176'],
+    ['#4fc3f7','#81d4fa','#ffffff'],
+    ['#ff8a65','#ffb74d','#fff'],
+    ['#ce93d8','#f48fb1','#fff'],
+];
+
+function ambientExplosion() {
+    const x = 60 + Math.random() * (canvas.width - 120);
+    const y = 40 + Math.random() * (canvas.height * 0.7);
+    const palette = BG_COLORS[Math.floor(Math.random() * BG_COLORS.length)];
+    spawnExplosion(x, y, 28 + Math.floor(Math.random() * 20), palette);
+}
+setInterval(ambientExplosion, 1800);
+
+function drawLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    stars.forEach(s => {
+        s.alpha += s.speed * s.dir;
+        if (s.alpha >= 1 || s.alpha <= 0.05) s.dir *= -1;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(245,210,100,${s.alpha})`;
+        ctx.fill();
+    });
+
+    shooters = shooters.filter(sh => sh.life > 0);
+    shooters.forEach(sh => {
+        sh.tail.push({ x: sh.x, y: sh.y });
+        if (sh.tail.length > 18) sh.tail.shift();
+        sh.x += sh.vx; sh.y += sh.vy; sh.life -= 0.02;
+        sh.tail.forEach((pt, i) => {
+            const a = (i / sh.tail.length) * sh.life * 0.8;
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, 1.2, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255,240,160,${a})`;
+            ctx.fill();
+        });
+        ctx.beginPath();
+        ctx.arc(sh.x, sh.y, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,200,${sh.life})`;
+        ctx.fill();
+        if (sh.x > canvas.width + 50 || sh.y > canvas.height + 50) sh.life = 0;
+    });
+
+    particles = particles.filter(p => p.alpha > 0);
+    particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        p.vy += 0.04;
+        p.vx *= 0.98;
+        p.alpha -= p.decay;
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.shadowBlur  = 8;
+        ctx.shadowColor = p.glow;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        ctx.restore();
+    });
+
+    requestAnimationFrame(drawLoop);
+}
+
+initStars();
+drawLoop();
+window.addEventListener('resize', () => { resizeCanvas(); initStars(); });
+
+/* ══════════════════════════════════
+   BUTTON — ripple + burst
+══════════════════════════════════ */
+function addRipple(btn, e) {
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x    = (e.clientX || rect.left + rect.width/2)  - rect.left - size/2;
+    const y    = (e.clientY || rect.top  + rect.height/2) - rect.top  - size/2;
+    const span = document.createElement('span');
+    span.className = 'ripple';
+    span.style.cssText = `width:${size}px;height:${size}px;left:${x}px;top:${y}px`;
+    btn.appendChild(span);
+    setTimeout(() => span.remove(), 600);
+}
+
+function btnClick(btn, callback, e) {
+    addRipple(btn, e || {});
+    const r  = btn.getBoundingClientRect();
+    const bx = (r.left + r.right)  / 2;
+    const by = (r.top  + r.bottom) / 2;
+    spawnExplosion(bx, by, 22, ['#f5c842','#ffe082','#ffffff','#ffd700']);
+    confetti({
+        particleCount: 35, spread: 60,
+        origin: { x: bx / window.innerWidth, y: by / window.innerHeight },
+        colors: ['#f5c842','#fff','#ffca28'], scalar: 0.7
+    });
+    setTimeout(callback, 320);
+}
+
+/* ══════════════════════════════════
+   NAVIGATION
+══════════════════════════════════ */
+function startExperience(btn) {
+    music.volume = 0;
+    music.play().then(() => { music.pause(); music.currentTime = 0; music.volume = 1; }).catch(() => {});
+    btnClick(btn, () => nextSlide(2));
+}
+
+function nextSlide(n) {
+    document.querySelectorAll('.slide').forEach(s => s.classList.remove('active','slide-enter'));
+    const target = document.getElementById('slide' + n);
+    target.classList.add('active');
+    void target.offsetWidth;
+    target.classList.add('slide-enter');
+    if (n === 4) runCountdown();
+}
+
+/* ══════════════════════════════════
+   COUNTDOWN
+══════════════════════════════════ */
+function runCountdown() {
+    let c  = 3;
+    const el = document.getElementById('countdownText');
+
+    function tick() {
+        el.classList.remove('pop');
+        void el.offsetWidth;
+        el.classList.add('pop');
+        spawnExplosion(canvas.width/2, canvas.height/2, 40, ['#f5c842','#ffe082','#ff8a65','#fff']);
+        c--;
+        if (c > 0) {
+            el.innerText = c;
+            setTimeout(tick, 900);
+        } else {
+            el.innerText = '🎉';
+            setTimeout(() => { nextSlide(5); startFinale(); }, 700);
+        }
+    }
+    setTimeout(tick, 200);
+}
+
+/* ══════════════════════════════════
+   SLIDESHOW (dad1, dad2)
+══════════════════════════════════ */
+function startSlideshow() {
+    const slides = document.querySelectorAll('.dad-slide');
+    let idx = 0;
+    slides[0].classList.add('show');
+
+    setInterval(() => {
+        slides[idx].classList.remove('show');
+        idx = (idx + 1) % slides.length;
+        slides[idx].classList.add('show');
+    }, 3000);
+}
+
+/* ══════════════════════════════════
+   FINALE
+══════════════════════════════════ */
+function startFinale() {
+    /* Play song immediately */
+    music.currentTime = 0;
+    music.volume = 1;
+    music.play().catch(() => {});
+
+    startSlideshow();
+
+    confetti({
+        particleCount: 180, spread: 100, origin: { y: 0.55 },
+        colors: ['#f5c842','#ffe082','#ffffff','#ffca28','#a0b8d8','#ff8a65']
+    });
+
+    const side = setInterval(() => {
+        confetti({ particleCount: 4, angle: 60,  spread: 55, origin: { x: 0 }, colors: ['#f5c842','#fff'] });
+        confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#f5c842','#fff'] });
+    }, 300);
+
+    let fb = 0;
+    const fireworks = setInterval(() => {
+        const x = 100 + Math.random() * (canvas.width  - 200);
+        const y = 80  + Math.random() * (canvas.height * 0.5);
+        spawnExplosion(x, y, 45, BG_COLORS[Math.floor(Math.random() * BG_COLORS.length)]);
+        if (++fb >= 10) clearInterval(fireworks);
+    }, 400);
+
+    setTimeout(() => clearInterval(side), 9000);
+}
+</script>
+</body>
+</html>
